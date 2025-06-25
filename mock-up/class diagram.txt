@@ -1,0 +1,41 @@
+class diagram
+
+board
+	BoardDAO
+	BoardRowMapper
+	BoardService
+	BoardServiceimpl
+
+common
+	UserDTO
+	boardDTO
+	JDBCUtil	
+
+user
+	UserDAO
+	UserRowMapper
+	UserService
+	UserServiceImpl
+	UserClient
+
+view
+   board
+	DeleteBoardController
+	GetBoradController
+	GetBoradListController
+	InsertBoardController
+	UpdateBoardController
+
+    user
+	LoginController
+	LogoutController
+		
+-------------------------
+webapp
+	Footer
+	Header
+	getBoard
+	getBoardList
+	insertBoard
+	memberList
+	login

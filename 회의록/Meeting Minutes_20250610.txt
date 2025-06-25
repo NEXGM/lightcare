@@ -1,0 +1,21 @@
+    Meeting Minutes
+
+Team : SilverCare
+Date : 20250610 
+Attandent : 최철호, 김훈, 김두섭, 서정우
+Record : 최철호
+
+Agenda 1.  Project 기획서 제출
+   - LightCare.pptx  14page 작성 및 제출
+     main fraim : 김두섭 
+     목업design 초안 : 김훈
+     사업성자료, 정보구조 : 최철호
+     User diagram : 서정우      
+
+Agenda 2.  web page design rule
+   - 은빛 깃털 로고제안_서정우
+   - 배경색 청/녹 바탕으로 초안 작성_김훈(금주중)
+     health info page design 시 design skil semina_김훈(금주중)
+   - web 구조에 따른 data base 설계(ERD)_ 김두섭(내일 review)
+   - 회원가입 page 제작시 전원 참여, 이후 R&R Asign
+   - 요양시설 data API 활용 방안 검토_서정우

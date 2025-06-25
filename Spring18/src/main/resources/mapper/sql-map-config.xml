@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"  
+		              "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+
+	 <!-- db를 설정해 놓은 프로퍼티스 파일을 읽어온다 -->
+	<!-- <properties resource="classpath:config/database.properties" />   -->
+	
+	<!-- 활용할 객체의 별칭: 패키지부터 붙이기 힘드니까 간단하게 처리하기위한 용도 -->
+	<typeAliases>
+		<typeAlias alias="board" type="com.spring.biz.common.BoardDTO"/>
+		<typeAlias alias="user" type="com.spring.biz.common.UserDTO"/>
+	</typeAliases>
+<!-- 	
+	<environments default="development1">
+		<environment id="development1">
+			<transactionManager type="JDBC"/>
+			<dataSource type="POOLED">
+				<property name="driver"  		  value="${jdbc.driver}"  />
+				<property name="url" 			  value="${jdbc.url}"/>
+				<property name="username" 		  value="${jdbc.username}" />
+				<property name="password"         value="${jdbc.password}" />
+			</dataSource>
+		</environment>
+	</environments>
+	 -->
+	<mappers>
+		<mapper  resource="mapper/board-mapper.xml" />
+		<mapper  resource="mapper/user-mapper.xml" />
+	</mappers>
+</configuration>		              

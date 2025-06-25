@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="BoardDAO">  
+<!-- xml의 식별이름 : 객체명처럼,  BoardDAO.insertBoard -->
+
+	
+	<!-- DTO 와  DB테이블을 매핑 -->
+	<resultMap id="boardResult" type="board">
+			 <!-- DTO클래스의 속성        DB 테이블컬럼명 -->
+		<id property="seq"         column="SEQ" />
+		<result property="title"   column="TITLE" />
+		<result property="writer"  column="WRITER" />
+		<result property="content" column="CONTENT" />
+		<result property="regDate" column="REGDATE" />
+		<result property="cnt"     column="CNT" />
+	</resultMap>
+
+
+    <!-- 등록 -->
+	<insert id="insertBoard" parameterType="board">
+	    <![CDATA[
+	        INSERT INTO BOARD(TITLE, WRITER, CONTENT)
+	        VALUES (#{title}, #{writer}, #{content})
+	   	]]>
+	</insert>
+	
+	<!-- 전체검색 -->
+	<select id="getBoardList"  resultMap="boardResult">
+		<![CDATA[ select * from board order by seq desc ]]>
+	</select>
+	<!-- 상세검색 -->
+	<select id="getBoard"  resultType="board">
+		<![CDATA[ select * from board where seq=#{seq} ]]>
+	</select>
+	
+	<!-- 수정 -->
+	<update id="updateBoard" parameterType="board">
+		update board set title=#{title}, content=#{content} where seq=#{seq}
+	</update>
+	
+	<!-- 삭제 :  -->
+	<delete id="deleteBoard" parameterType="board" >
+		delete from board where seq=#{seq}
+	</delete>
+</mapper>

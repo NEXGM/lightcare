@@ -1,0 +1,161 @@
+사용자님, 공유받은 도커 이미지를 활용하는 방법을 궁금해하시는군요! 🧐 팀원들과 협업하여 이미지를 공유하고 로컬 환경을 구성하는 것은 도커의 강력한 장점입니다. 제가 사용자님께 그 방법을 명확하게 알려드릴게요.
+
+### **공유받은 도커 이미지 활용 방법 (Docker Hub 사용 시):**
+
+이 시나리오는 팀원 중 한 명이 이미지를 빌드하여 Docker Hub와 같은 중앙 이미지 저장소에 푸시(Push)했고, 다른 팀원이 그 이미지를 가져와(Pull) 사용하는 경우를 전제로 합니다.
+
+**전제 조건:**
+
+1.  **공유된 도커 이미지 존재:** 팀원이 이미지를 빌드하여 Docker Hub (또는 다른 컨테이너 레지스트리)에 성공적으로 푸시했습니다.
+    * 예: `dooseob/lightcare-backend:latest`, `dooseob/lightcare-frontend:latest` 와 같이 사용자님의 Docker Hub 계정명(dooseob)이 붙은 이미지.
+2.  **`docker-compose.yml` 파일:** 이미지를 가져와 컨테이너를 실행하기 위한 `docker-compose.yml` 파일이 준비되어 있어야 합니다. 이 파일은 GitHub에서 클론(Clone) 받으면 됩니다.
+3.  **Docker Desktop 설치 및 실행:** 이미지를 사용할 PC에 Docker Desktop이 설치되어 있고 실행 중이어야 합니다.
+
+---
+
+**단계별 가이드:**
+
+**1단계: GitHub에서 프로젝트 클론 (Clone)**
+
+* **새로운 PC에서 터미널(Git Bash 또는 PowerShell) 열기:**
+    * 시작 메뉴에서 `Git Bash` 또는 `PowerShell`을 검색하여 실행합니다.
+* **프로젝트 파일을 저장할 적절한 폴더로 이동:**
+    * 예: `cd C:\Users\사용자이름\Projects\`
+* **GitHub 저장소 클론 (Clone) 명령어 실행:**
+    * 사용자님의 `LightCare_FullStack` 저장소를 클론합니다:
+        ```bash
+        git clone https://github.com/dooseob/LightCare_FullStack.git
+        ```
+        * `https://github.com/dooseob/LightCare_FullStack.git` 대신 사용자님의 **정확한 저장소 URL**을 사용해야 합니다.
+* **클론된 프로젝트 폴더로 이동:**
+    ```bash
+    cd LightCare_FullStack
+    ```
+
+**2단계: Docker Desktop 실행 확인 및 Docker Hub 로그인**
+
+1.  **Docker Desktop 앱 실행:**
+    * 새로운 PC에서 Docker Desktop 앱이 실행 중인지 확인합니다. (오른쪽 하단 트레이 아이콘에 도커 고래 모양이 초록색으로 나타나야 함)
+    * 만약 실행 중이 아니거나 멈춰 있다면, Docker Desktop 앱을 시작합니다.
+2.  **Docker Hub 로그인 (터미널에서):**
+    * 공유된 이미지가 Docker Hub에 있다면, 이미지를 다운로드 받기 위해 Docker Hub에 로그인해야 합니다.
+        ```bash
+        docker login
+        ```
+    * Docker Hub 사용자 이름과 비밀번호를 입력하라는 메시지가 나타날 것입니다.
+
+**3단계: `docker-compose.yml` 파일 수정 (이미지 사용 설정)**
+
+* `LightCare_FullStack` 폴더 안에 있는 `docker-compose.yml` 파일을 코드 에디터(VS Code 등)로 엽니다.
+* **`backend`와 `frontend` 서비스에 `build` 대신 `image`를 사용하도록 수정**합니다. 이렇게 하면 Dockerfile을 다시 빌드하지 않고 이미 푸시된 이미지를 바로 사용합니다.
+
+    ```yaml
+    version: '3.8' # 이 줄은 경고를 낼 수 있음. 삭제해도 무방.
+
+    services:
+      mysql:
+        image: mysql:8.0
+        container_name: lightcare-mysql
+        restart: unless-stopped
+        environment:
+          MYSQL_ROOT_PASSWORD: your_mysql_root_password
+          MYSQL_DATABASE: lightcaredb
+          MYSQL_USER: lightcare_user
+          MYSQL_PASSWORD: new_password123
+        ports:
+          - "3306:3306"
+        volumes:
+          - mysql_data:/var/lib/mysql
+          - ./mysql/init:/docker-entrypoint-initdb.d:ro
+        networks:
+          - lightcare-network
+        command: --default-authentication-plugin=mysql_native_password
+
+      lightcare-back:
+        # build: ./LightCare # ★★★ 이 줄을 주석 처리하거나 삭제합니다. ★★★
+        image: dooseob/lightcare-lightcare-back:latest # ★★★ 공유받은 백엔드 이미지 이름으로 수정! ★★★
+        container_name: lightcare-backend
+        restart: unless-stopped
+        ports:
+          - "8080:8080"
+        depends_on:
+          - mysql
+        environment:
+          DB_URL: jdbc:mysql://mysql:3306/lightcaredb?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+          DB_USERNAME: lightcare_user
+          DB_PASSWORD: new_password123
+          SERVER_SERVLET_CONTEXT_PATH: /lightcare
+        networks:
+          - lightcare-network
+
+      lightcare-front:
+        # build: ./lightcare-front # ★★★ 이 줄을 주석 처리하거나 삭제합니다. ★★★
+        image: dooseob/lightcare-lightcare-front:latest # ★★★ 공유받은 프론트엔드 이미지 이름으로 수정! ★★★
+        container_name: lightcare-frontend
+        restart: unless-stopped
+        ports:
+          - "3000:3000"
+        depends_on:
+          - lightcare-back
+        environment:
+          NEXT_PUBLIC_API_URL: http://nginx/lightcare
+        networks:
+          - lightcare-network
+
+      nginx:
+        # build: # ★★★ 이 섹션도 주석 처리하거나 삭제합니다. ★★★
+        #   context: ./nginx
+        #   dockerfile: Dockerfile
+        image: nginx:alpine # Nginx 이미지는 Docker Hub에서 바로 풀(Pull) 받음
+        container_name: lightcare-nginx
+        restart: unless-stopped
+        ports:
+          - "80:80"
+          - "443:443"
+        volumes:
+          - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+        depends_on:
+          - lightcare-front
+          - lightcare-back
+        networks:
+          - lightcare-network
+
+    volumes:
+      mysql_data:
+
+    networks:
+      lightcare-network:
+        driver: bridge
+    ```
+    * **중요:** `dooseob/lightcare-lightcare-back:latest`와 `dooseob/lightcare-lightcare-front:latest` 부분은 이미지를 푸시한 **정확한 Docker Hub 계정명과 이미지 이름, 태그**로 변경해야 합니다.
+    * **파일 저장.**
+
+**4단계: Docker Compose로 모든 서비스 실행**
+
+1.  **관리자 권한으로 터미널 열기:**
+    * Windows의 검색창에 `cmd` 또는 `PowerShell`을 입력하고, 마우스 오른쪽 버튼을 클릭하여 **"관리자 권한으로 실행"** 을 선택합니다.
+2.  **`LightCare_FullStack` 폴더로 이동:**
+    * 방금 클론한 `LightCare_FullStack` 폴더로 이동합니다.
+3.  **모든 서비스 실행 명령어 실행:**
+    * `build` 옵션을 제외하고 실행합니다.
+        ```bash
+        docker compose up -d
+        ```
+    * 이 명령어를 실행하면 Docker가 Docker Hub에서 필요한 이미지를 자동으로 다운로드하고, 컨테이너들을 시작합니다. 시간이 다소 소요될 수 있습니다.
+
+**5단계: 로컬에서 웹 애플리케이션 접속 확인**
+
+1.  **컨테이너 상태 확인:**
+    * 다음 명령어를 실행하여 모든 컨테이너가 정상적으로 `running` 상태인지 확인합니다:
+        ```bash
+        docker compose ps
+        ```
+    * `State` 컬럼이 모두 `Up`으로 표시되어야 합니다.
+2.  **웹 브라우저 열기:**
+    * 웹 브라우저를 열고 주소창에 다음 URL을 입력합니다:
+        ```
+        http://localhost/
+        ```
+    * Nginx 컨테이너가 로컬 PC의 80번 포트를 통해 요청을 받아서 프론트엔드 웹 앱을 표시해 줄 것입니다.
+
+**이렇게 하면 팀원들은 Dockerfile을 다시 빌드할 필요 없이, 이미 푸시된 이미지를 바로 활용하여 개발 환경을 빠르고 일관성 있게 구축할 수 있습니다!** 정말 훌륭합니다! 💪

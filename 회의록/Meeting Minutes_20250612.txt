@@ -1,0 +1,37 @@
+    Meeting Minutes
+
+Team : SilverCare
+Date : 20250612 
+Attandent : 최철호, 김훈, 김두섭, 서정우
+Recorder : 최철호
+
+Agenda 1.  기능확정
+  주요기능 : 회원가입, 탈퇴, login/out, 시설검색 서비스, 구인구직 서비스      
+
+Agenda 2.  정보구조확정
+  별첨 1 . 정보구조.png
+
+Agenda 3. ERD확정
+  별첨 2. erd.png
+
+Agenda 4. R&R
+  최철호 : 팀장 - 팀 관리
+  김두섭 : PM - 프로젝트 스케줄 관리
+  김   훈 : Front-end leader - Front-end 개발 리딩
+  서정우 : Back-end leader - Back-end 개발 리딩
+
+Agenda 5. 협업을 위한 API 명세서
+  업체 자료 data : https://www.data.go.kr/data/15056929/openapi.do?recommendDataYn=Y
+  Maps API       : https://apis.map.kakao.com/
+
+Agenda 6. 필요한 기술스텍
+  Frontend : HTML,CSS, JavaScript
+  Backend : Java, SpringFramework
+  Database : MySQL
+  Web Server :  Apache HTTP Server
+
+Agenda 7. 
+  VIEW Proto type : 김훈, 서정우(6/16 예정)
+  무드보드 작성 : 김훈 (6/16 예정)
+  리소스 준비 : 김훈, 김두섭(6/16 예정)
+	        

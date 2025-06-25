@@ -1,0 +1,100 @@
+깃허브 팀프로젝트파일 로컬 다운로드
+git clone https://github.com/dooseob/LightCare.git
+
+dooseob/lightcare-front:1.0
+dooseob/lightcare-back:1.0
+dooseob/lightcare-nginx:1.0
+
+Step 1: 도커(Docker) 설치 확인
+가장 먼저 팀원 컴퓨터에 도커가 설치되어 있고 잘 실행되는지 확인해야 해.
+
+Bash
+
+docker --version
+docker ps
+docker --version으로 버전이 나오고, docker ps로 아무 컨테이너도 안 돌아가고 있어도 에러 메시지가 안 뜨면 잘 설치된 거야.
+
+Step 2: 도커 이미지 다운로드 (Pull)
+이제 팀원이 네가 공유한 이미지를 자기 컴퓨터로 다운받을 차례야.
+
+Bash
+
+docker pull [네 도커 허브 아이디]/[레포지토리 이름]:[태그]
+예시:
+
+프론트엔드 이미지 다운로드:
+Bash
+
+docker pull dooseob/lightcare-front:1.0
+백엔드 이미지 다운로드:
+Bash
+
+docker pull dooseob/lightcare-back:1.0
+Nginx 이미지 다운로드:
+Bash
+
+docker pull dooseob/lightcare-nginx:1.0
+이미지가 성공적으로 다운로드되었는지 확인하려면 docker images 명령어를 사용해 보면 돼.
+
+Step 3: 도커 컨테이너 실행 (Run)
+이미지를 다운받았으니, 이제 이 이미지들을 바탕으로 컨테이너를 실행해서 네 애플리케이션 환경을 띄울 수 있어.
+
+방법 1: 개별 컨테이너 하나씩 실행 (간단한 테스트용)
+
+각 컨테이너마다 docker run 명령어를 사용해야 해. 이때 필요한 포트 매핑이나 환경 변수 등을 잘 설정해 줘야 해.
+
+Nginx 컨테이너 실행 예시 (80번 포트 외부 노출):
+
+Bash
+
+docker run -d --name lightcare-nginx-server -p 80:80 dooseob/lightcare-nginx:1.0
+-d: 백그라운드에서 실행 (detached mode)
+--name: 컨테이너 이름 지정
+-p 80:80: 호스트(팀원 컴퓨터)의 80번 포트를 컨테이너의 80번 포트에 연결
+백엔드 컨테이너 실행 예시 (8080 포트 외부 노출, DB 연결 고려):
+
+Bash
+
+docker run -d --name lightcare-backend-server -p 8080:8080 \
+  -e DATABASE_URL=jdbc:mysql://[DB 컨테이너 이름 또는 IP]:3306/lightcare \
+  -e DATABASE_USERNAME=user -e DATABASE_PASSWORD=password \
+  dooseob/lightcare-back:1.0
+-e: 환경 변수 설정 (DB 연결 정보 등)
+주의: [DB 컨테이너 이름 또는 IP] 부분은 DB 컨테이너가 어떻게 실행되는지에 따라 달라져. 이 방법은 여러 컨테이너를 연결할 때 복잡해질 수 있어. 그래서 다음 방법이 더 유용해!
+방법 2: Docker Compose로 한 번에 실행 (강력 추천!)
+
+네가 docker-compose.yml 파일을 깃허브에 공유했다면, 팀원이 그 파일을 받아서 단 하나의 명령어로 모든 컨테이너를 한 번에 띄울 수 있어. 이건 정말 팀 협업의 꽃이지!
+
+docker-compose.yml 파일 준비:
+네가 깃허브에 올려둔 docker-compose.yml 파일을 팀원이 git clone해서 자기 컴퓨터로 가져와야 해.
+(이 파일 안에는 프론트, 백엔드, Nginx, MySQL 컨테이너들의 정의와 서로 간의 연결 설정이 모두 들어있을 거야.)
+
+docker-compose.yml 파일이 있는 디렉토리로 이동:
+
+Bash
+
+cd /path/to/your/project/directory # (팀원이 깃허브에서 클론한 프로젝트 폴더)
+Docker Compose로 컨테이너 실행:
+해당 디렉토리에서 아래 명령어를 실행하면 docker-compose.yml 파일에 정의된 모든 서비스(컨테이너)가 자동으로 다운로드(아직 없으면)되고 빌드(로컬 빌드 옵션이 있으면) 및 실행될 거야.
+
+Bash
+
+docker-compose up -d
+up: docker-compose.yml에 정의된 서비스를 생성하고 시작해.
+-d: 백그라운드에서 실행해.
+만약 이미지가 이미 도커 허브에 있으니 로컬에서 빌드하는 과정을 건너뛰고 싶다면, docker-compose.yml 파일 내의 build 대신 image 항목에 네 도커 허브 이미지를 지정해두는 게 좋아. (네가 이미 그렇게 해뒀을 거야!)
+
+정리하자면:
+단일 컨테이너: docker pull 후 docker run
+복수 컨테이너 (협업의 정석): docker-compose.yml 파일과 함께 docker pull된 이미지들을 docker-compose up
+팀원들이 docker-compose up -d 한 번만 치면 네가 힘들게 구축한 개발 환경이 그대로 복제되어 실행되는 모습을 보면 정말 뿌듯할 거야! 이게 바로 도커가 주는 엄청난 편리함과 강력함이거든.
+
+네가 이렇게 도커를 능숙하게 다루는 모습을 보니, 나중에 스마트팩토리 운영이나 데이터 수집 기반 작업 같은 분야에서도 큰 재능을 발휘할 수 있을 것 같아! 차근차근 잘 해나가고 있어. 응원한다! 💪
+
+
+docker compose down -v
+
+docker compose up -d
+
+http://localhost:3000/
+
